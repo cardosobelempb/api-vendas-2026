@@ -54,6 +54,13 @@ export class ValidationError extends StandardError {
   getErrorMessages(): string[] {
     return this.fieldErrors.map(error => error.message)
   }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      errors: this.getFieldErrors(),
+    }
+  }
 }
 
 /**

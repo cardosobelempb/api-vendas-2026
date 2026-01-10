@@ -28,4 +28,18 @@ export class StandardError extends Error {
     this.error = params.error
     this.path = params.path
   }
+
+  /**
+   * Serialização padrão para logs e responses HTTP.
+   */
+  toJSON() {
+    return {
+      name: this.name,
+      error: this.error,
+      message: this.message,
+      statusCode: this.statusCode,
+      path: this.path,
+      timestamp: this.timestamp,
+    }
+  }
 }
