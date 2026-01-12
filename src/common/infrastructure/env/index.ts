@@ -10,12 +10,18 @@ export const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
-
   PORT: z.coerce.number().default(3333),
-
-  API_URL: z.string().url().default('http://localhost:3333'),
-
+  DB_TYPE: z.literal('postgres').default('postgres'),
+  DB_SCHEMA: z.string().default('public'),
+  API_URL: z.url().default('http://localhost:3333'),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL é obrigatória'),
+  APP_PORT: z.coerce.number().default(8080),
+  DB_HOST: z.string().default('localhost'),
+  DB_PORT: z.coerce.number().default(5432),
+  DB_NAME: z.string().default('postgres'),
+  DB_USER: z.string().default('postgres'),
+  DB_PASSWORD: z.string().default('postgres'),
+  DB_DIALECT: z.string().default('postgres'),
 })
 
 const parsedEnv = envSchema.safeParse(process.env)

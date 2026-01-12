@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: bitnami/postgresql:latest
+    container_name: db_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: api-base
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/bitnami/postgresql
+volumes:
+  postgres_data:
+    driver: local
+  # cache:
+  #   container_name: nest-clean-cache
+  #   image: redis
+  #   ports:
+  #     - 6379:6379
+  #   volumes:
+  #     - ./data/redis:/data

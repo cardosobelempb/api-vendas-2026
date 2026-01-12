@@ -1,33 +1,102 @@
-import cors from 'cors'
-import express from 'express'
+import cors, { CorsOptions } from 'cors'
+import express, { Application } from 'express'
+import helmet from 'helmet'
+import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 
-import swaggerJSDoc from 'swagger-jsdoc'
-import { erroHandler } from './middlewares/errorHandler'
+import { env } from '../env'
+import { errorHandler } from './middlewares/errorHandler'
 import { router } from './routes'
 
-const options = {
+/**
+ * =============================
+ * Swagger (OpenAPI) Config
+ * =============================
+ */
+const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API Documntation',
+      title: 'API Documentation',
       version: '1.0.0',
+      description: 'Documentação da API',
     },
   },
-  apis: [],
+  apis: ['src/routes/**/*.ts'],
 }
 
-const swaggerSpec = swaggerJSDoc(options)
+/**
+ * =============================
+ * CORS Config (por ambiente)
+ * =============================
+ */
+function getCorsOptions(): CorsOptions {
+  if (env.NODE_ENV === 'production') {
+    return {
+      // origin: env.CORS_ORIGIN?.split(',') ?? [],
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    }
+  }
 
-const app = express()
+  // Desenvolvimento
+  return {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  }
+}
 
-app.use(cors())
+/**
+ * =============================
+ * Cria e configura o Express
+ * =============================
+ */
+function createApp(): Application {
+  const app = express()
 
-app.use(express.json())
+  /**
+   * Segurança HTTP
+   */
+  app.use(helmet())
 
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+  /**
+   * CORS
+   */
+  app.use(cors(getCorsOptions()))
 
-app.use(router)
-app.use(erroHandler)
+  /**
+   * Body parsers
+   */
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: true }))
 
-export { app }
+  /**
+   * Healthcheck
+   * Importante para Docker, K8s, Load Balancers
+   */
+  app.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok' })
+  })
+
+  /**
+   * Swagger (somente fora de produção)
+   */
+  if (env.NODE_ENV !== 'production') {
+    const swaggerSpec = swaggerJSDoc(swaggerOptions)
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+  }
+
+  /**
+   * Rotas
+   */
+  app.use(router)
+
+  /**
+   * Middleware global de erro
+   * ⚠️ Deve ser o último
+   */
+  app.use(errorHandler)
+
+  return app
+}
+
+export { createApp }

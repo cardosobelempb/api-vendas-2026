@@ -23,7 +23,9 @@ export class EmailVO {
     }
 
     this._value = normalized
-    this._label = label
+    if (label !== undefined) {
+      this._label = label
+    }
   }
 
   // Factory estático
@@ -69,7 +71,13 @@ export class EmailVO {
 
   // Serialização
   public toJSON(): { value: string; label?: string } {
-    return { value: this._value, label: this._label }
+    const json: { value: string; label?: string } = { value: this._value }
+
+    if (this._label !== undefined) {
+      json.label = this._label
+    }
+
+    return json
   }
 
   // Para string

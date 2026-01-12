@@ -12,11 +12,11 @@ export class ValidationError extends StandardError {
    */
   private readonly fieldErrors: FieldMessage[] = []
 
-  constructor(path: string) {
+  constructor(path: string, statusCode = 400) {
     super({
       error: 'Validation Error',
       message: 'Dados inválidos',
-      statusCode: 400,
+      statusCode,
       path,
     })
   }

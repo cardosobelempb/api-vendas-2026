@@ -32,7 +32,11 @@ export class PasswordVO {
     }
 
     this.value = password
-    this.hasher = hasher
+
+    // Só atribui se hash existe
+    if (hasher !== undefined) {
+      this.hasher = hasher
+    }
 
     // Define valores padrão — evita checagens repetidas
     this.options = {
