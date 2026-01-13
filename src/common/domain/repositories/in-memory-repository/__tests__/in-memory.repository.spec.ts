@@ -197,29 +197,26 @@ describe('InmemoryRepository unit tests', () => {
     it('should filter when filter param', async () => {
       // const result = stubFactory.create(props)
       const items = [
-        stubFactory?.create({
-          id: randomUUID(),
+        stubFactory.create({
+          id: '1',
           name: 'test',
           price: 10,
           createdAt,
           updatedAt,
-          deletedAt,
         }),
-        stubFactory?.create({
-          id: randomUUID(),
+        stubFactory.create({
+          id: '2',
           name: 'TEST',
           price: 20,
           createdAt,
           updatedAt,
-          deletedAt,
         }),
-        stubFactory?.create({
-          id: randomUUID(),
+        stubFactory.create({
+          id: '3',
           name: 'fake',
           price: 30,
           createdAt,
           updatedAt,
-          deletedAt,
         }),
       ]
 
@@ -243,4 +240,74 @@ describe('InmemoryRepository unit tests', () => {
       expect(result).toHaveLength(0)
     })
   })
+
+  describe('applySort', async () => {
+    it('should no sort when sort param is null', async () => {
+      // const result = stubFactory.create(props)
+      const items = [
+        stubFactory.create({
+          id: '1',
+          name: 'b',
+          price: 10,
+          createdAt,
+          updatedAt,
+        }),
+        stubFactory.create({
+          id: '2',
+          name: 'a',
+          price: 20,
+          createdAt,
+          updatedAt,
+        }),
+        stubFactory.create({
+          id: '3',
+          name: 'c',
+          price: 30,
+          createdAt,
+          updatedAt,
+        }),
+      ]
+
+      let result = sut['applySort'](items)
+      expect(result).toStrictEqual(items)
+
+      result = sut['applySort'](items, 'id', 'asc')
+      expect(result).toStrictEqual(items)
+    })
+
+    it('should sort when sort param', async () => {
+      // const result = stubFactory.create(props)
+      const items = [
+        stubFactory.create({
+          id: '1',
+          name: 'b',
+          price: 10,
+          createdAt,
+          updatedAt,
+        }),
+        stubFactory.create({
+          id: '2',
+          name: 'a',
+          price: 20,
+          createdAt,
+          updatedAt,
+        }),
+        stubFactory.create({
+          id: '3',
+          name: 'c',
+          price: 30,
+          createdAt,
+          updatedAt,
+        }),
+      ]
+
+      let result = sut['applySort'](items, 'name', 'desc')
+      expect(result).toStrictEqual([items[2], items[0], items[1]])
+
+      result = sut['applySort'](items, 'name', 'asc')
+      expect(result).toStrictEqual([items[1], items[0], items[2]])
+    })
+  })
 })
+
+/**npm run test -- in-memory.repository.spec.ts */
