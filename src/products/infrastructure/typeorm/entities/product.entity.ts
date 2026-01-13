@@ -24,7 +24,7 @@ export class ProductEntity {
    * Manter como string na Entity
    */
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  price!: string
+  price!: number
 
   @Column({ type: 'int' })
   quantity!: number

@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto'
-import { NotFoundError } from '../errors'
-import { RepositoryAbstract } from './repository.abstract'
-import { SearchInput, SearchOutput } from './search'
+
+import { NotFoundError } from '../../errors'
+import { SearchInput, SearchOutput } from '../Search'
+import { SearchableRepository } from '../SearchableRepository'
 
 /**
  * Tipos de propriedades genéricas de uma entidade
@@ -27,7 +28,7 @@ export type CreateProps<Entity> = Partial<
  */
 export abstract class InMemoryRepository<
   Entity extends ModelProps,
-> implements RepositoryAbstract<Entity, CreateProps<Entity>> {
+> implements SearchableRepository<Entity> {
   /** Armazena todas as entidades em memória */
   protected items: Entity[] = []
 
@@ -50,15 +51,15 @@ export abstract class InMemoryRepository<
    * Cria uma nova entidade em memória
    * Não persiste
    */
-  newEntity(props: CreateProps<Entity>): Entity {
-    return {
-      id: randomUUID(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-      ...props,
-    } as Entity
-  }
+  // newEntity(props: CreateProps<Entity>): Entity {
+  //   return {
+  //     id: randomUUID(),
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //     deletedAt: null,
+  //     ...props,
+  //   } as Entity
+  // }
 
   /**
    * Persiste ou atualiza a entidade em memória
@@ -85,19 +86,16 @@ export abstract class InMemoryRepository<
    * Soft delete da entidade
    */
   async delete(entity: Entity): Promise<void> {
-    if (!entity.id) {
-      throw new NotFoundError(`Entity not found using id ${entity.id}`)
-    }
-
     await this._get(entity.id)
     const index = this.items.findIndex(item => item.id === entity.id)
 
-    if (index === -1) {
-      throw new NotFoundError(`Entity not found using id ${entity.id}`)
-    }
+    // if (index === -1) {
+    //   throw new NotFoundError(`Entity not found using id ${entity.id}`)
+    // }
 
+    this.items.splice(index, 1)
     // Agora TypeScript sabe que items[index] existe
-    this.items[index]!.deletedAt = new Date()
+    // this.items[index]!.deletedAt = new Date()
   }
 
   /**
@@ -134,7 +132,7 @@ export abstract class InMemoryRepository<
   /**
    * Busca entidade por ID ou lança erro
    */
-  protected async _get(id: string): Promise<Entity> {
+  protected async _get(id: string | undefined): Promise<Entity> {
     const entity = this.items.find(item => item.id === id && !item.deletedAt)
     if (!entity) throw new NotFoundError(`Entity not found using id ${id}`)
     return entity
