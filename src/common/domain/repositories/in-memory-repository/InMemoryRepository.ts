@@ -1,6 +1,5 @@
-import { randomUUID } from 'node:crypto'
-
 import { NotFoundError } from '../../errors'
+import { UUIDVO } from '../../values-objects'
 import { SearchInput, SearchOutput } from '../Search'
 import { SearchableRepository } from '../SearchableRepository'
 
@@ -8,7 +7,7 @@ import { SearchableRepository } from '../SearchableRepository'
  * Tipos de propriedades genéricas de uma entidade
  */
 export type ModelProps = {
-  id?: string
+  id?: UUIDVO
   createdAt?: Date
   updatedAt?: Date
   deletedAt?: Date | null
@@ -66,12 +65,12 @@ export abstract class InMemoryRepository<
    */
   async save(entity: Entity): Promise<Entity> {
     if (!entity.id) {
-      entity.id = randomUUID()
+      entity.id = UUIDVO.create()
       entity.createdAt = new Date()
     }
 
-    entity.updatedAt = new Date()
-    const index = this.items.findIndex(item => item.id === entity.id)
+    // entity.updatedAt = new Date()
+    const index = this.items.findIndex(item => item.id?.equals(entity.id))
 
     if (index === -1) {
       this.items.push(entity)
@@ -86,7 +85,7 @@ export abstract class InMemoryRepository<
    * Soft delete da entidade
    */
   async delete(entity: Entity): Promise<void> {
-    await this._get(entity.id)
+    await this._get(entity.id?.getValue())
     const index = this.items.findIndex(item => item.id === entity.id)
 
     // if (index === -1) {
@@ -133,7 +132,9 @@ export abstract class InMemoryRepository<
    * Busca entidade por ID ou lança erro
    */
   protected async _get(id: string | undefined): Promise<Entity> {
-    const entity = this.items.find(item => item.id === id && !item.deletedAt)
+    const entity = this.items.find(
+      item => item.id?.getValue() === id && !item.deletedAt,
+    )
     if (!entity) throw new NotFoundError(`Entity not found using id ${id}`)
     return entity
   }

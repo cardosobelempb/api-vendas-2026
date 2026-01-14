@@ -1,3 +1,7 @@
 export * from './common'
+export * from './entities'
 export * from './errors'
+export * from './events'
 export * from './repositories'
+export * from './validations'
+export * from './values-objects'

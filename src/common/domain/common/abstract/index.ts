@@ -1,4 +1,3 @@
-export * from './AggregateAbstract'
 export * from './EncrypterAbstract'
 export * from './hash-comparer.abstract'
 export * from './hash-generator.abstract'
@@ -12,4 +11,3 @@ export * from './JwtAbstract'
 export * from './upload'
 
 export * from './AbstractUseCase'
-

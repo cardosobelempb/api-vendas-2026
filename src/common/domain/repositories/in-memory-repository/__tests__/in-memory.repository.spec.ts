@@ -1,12 +1,13 @@
+import { UUIDVO } from '@/common/domain/values-objects'
 import { randomUUID } from 'node:crypto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { EntityBuild } from '../../../entities/EntityBuild'
 import { NotFoundError } from '../../../errors'
-import { EntityFactory } from '../../EntityFactory'
 import { InMemoryRepository } from '../InMemoryRepository'
 
 type StubEntityProsp = {
-  id: string
+  id: UUIDVO
   name: string
   price: number
   createdAt: Date
@@ -15,13 +16,13 @@ type StubEntityProsp = {
 }
 
 class StubEntity {
-  id: string
+  id: UUIDVO
   name: string
   price: number
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
-  constructor(id: string, name: string, price: number) {
+  constructor(id: UUIDVO, name: string, price: number) {
     this.id = id
     this.name = name
     this.price = price
@@ -31,10 +32,10 @@ class StubEntity {
   }
 }
 
-export class StubFactory implements EntityFactory<StubEntity, StubEntityProsp> {
+export class StubFactory implements EntityBuild<StubEntity, StubEntityProsp> {
   create(props: StubEntityProsp): StubEntity {
     // Geração de ID centralizada
-    const id = randomUUID()
+    const id = UUIDVO.create()
 
     // Criação da entidade já validada
     return new StubEntity(id, props.name, props.price)
@@ -127,7 +128,7 @@ describe('InmemoryRepository unit tests', () => {
 
     it('should find a entity by id', async () => {
       const data = await sut.save(props)
-      const result = await sut.findById(data.id)
+      const result = await sut.findById(data.id.getValue())
       expect(result).toBeDefined()
       expect(result).toStrictEqual(data)
     })
@@ -145,19 +146,19 @@ describe('InmemoryRepository unit tests', () => {
     it('should update an entity', async () => {
       entity = await sut.save(props)
       const entityUpdated = stubFactory.create({
-        id: randomUUID(),
+        id: UUIDVO.create(),
         name: 'updated name',
         price: 2000,
         createdAt: new Date(),
         updatedAt: new Date(),
       })
-      entity = await sut.save(entityUpdated)
+      const data = (entity = await sut.save(entityUpdated))
 
       const result = await sut.search({ filter: 'updated name' })
 
       expect(result.items).toHaveLength(1)
       expect(result.items[0]?.name).toBe('updated name')
-      expect(result.items[0]).toStrictEqual(entity)
+      expect(result.items[0]).toStrictEqual(data)
     })
   })
 
@@ -198,21 +199,21 @@ describe('InmemoryRepository unit tests', () => {
       // const result = stubFactory.create(props)
       const items = [
         stubFactory.create({
-          id: '1',
+          id: UUIDVO.create(),
           name: 'test',
           price: 10,
           createdAt,
           updatedAt,
         }),
         stubFactory.create({
-          id: '2',
+          id: UUIDVO.create(),
           name: 'TEST',
           price: 20,
           createdAt,
           updatedAt,
         }),
         stubFactory.create({
-          id: '3',
+          id: UUIDVO.create(),
           name: 'fake',
           price: 30,
           createdAt,
@@ -246,21 +247,21 @@ describe('InmemoryRepository unit tests', () => {
       // const result = stubFactory.create(props)
       const items = [
         stubFactory.create({
-          id: '1',
+          id: UUIDVO.create(),
           name: 'b',
           price: 10,
           createdAt,
           updatedAt,
         }),
         stubFactory.create({
-          id: '2',
+          id: UUIDVO.create(),
           name: 'a',
           price: 20,
           createdAt,
           updatedAt,
         }),
         stubFactory.create({
-          id: '3',
+          id: UUIDVO.create(),
           name: 'c',
           price: 30,
           createdAt,
@@ -279,21 +280,21 @@ describe('InmemoryRepository unit tests', () => {
       // const result = stubFactory.create(props)
       const items = [
         stubFactory.create({
-          id: '1',
+          id: UUIDVO.create(),
           name: 'b',
           price: 10,
           createdAt,
           updatedAt,
         }),
         stubFactory.create({
-          id: '2',
+          id: UUIDVO.create(),
           name: 'a',
           price: 20,
           createdAt,
           updatedAt,
         }),
         stubFactory.create({
-          id: '3',
+          id: UUIDVO.create(),
           name: 'c',
           price: 30,
           createdAt,
