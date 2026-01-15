@@ -1,3 +1,2 @@
-import { BadRequestError } from './bad-request.error'
-
-export { BadRequestError }
+export * from './BadRequestError'
+export * from './IControllerError'

@@ -25,7 +25,7 @@ export type CreateProps<Entity> = Partial<
  * Repositório genérico em memória
  * Útil para testes ou prototipagem
  */
-export abstract class InMemoryRepository<
+export abstract class RepositoryInMemory<
   Entity extends ModelProps,
 > implements SearchableRepository<Entity> {
   /** Armazena todas as entidades em memória */

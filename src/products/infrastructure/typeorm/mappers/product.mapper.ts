@@ -1,36 +1,30 @@
-import { UUIDVO } from '@/common/domain'
-import { ProductModel } from '@/products/domain/models/product.model'
+// infrastructure/mappers/product.mapper.ts
 
-import { ProductOrmEntity } from '../entities/product.orm-entity'
+import { ProductModel } from '@/products/domain'
+import { ProductEntity } from '@/products/domain/entitties'
 
 export class ProductMapper {
-  /**
-   * Converte Entity (TypeORM) para Domain Model
-   */
-  static toDomain(entity: ProductOrmEntity): ProductModel {
+  static toDomain(model: ProductModel): ProductEntity {
+    return ProductEntity.restore({
+      id: model.id,
+      name: model.name,
+      price: model.price,
+      quantity: model.quantity,
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt,
+      deletedAt: model.deletedAt,
+    })
+  }
+
+  static toModel(entity: ProductEntity): ProductModel {
     return {
-      id: UUIDVO.create(entity.id),
+      id: entity.id,
       name: entity.name,
-      price: Number(entity.price), // converte decimal string para number
+      price: entity.price,
       quantity: entity.quantity,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
-      deletedAt: entity.deletedAt ?? null,
-    }
-  }
-
-  /**
-   * Converte Domain Model para Entity parcial (persistência)
-   */
-  static toPersistence(domain: ProductModel): Partial<ProductOrmEntity> {
-    return {
-      id: domain.id?.getValue() ?? '',
-      name: domain.name,
-      price: domain.price.toFixed(2), // string para Postgres decimal
-      quantity: domain.quantity,
-      createdAt: domain.createdAt,
-      updatedAt: domain.updatedAt,
-      deletedAt: domain.deletedAt ?? null,
+      deletedAt: entity.deletedAt,
     }
   }
 }

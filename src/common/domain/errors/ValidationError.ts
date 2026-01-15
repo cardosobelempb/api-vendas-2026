@@ -1,5 +1,5 @@
-import { FieldMessage } from './field-message.error'
-import { StandardError } from './standard-error.error'
+import { FieldMessage } from './FieldMessage'
+import { StandardError } from './StandardError'
 
 /**
  * Erro de validação contendo múltiplos erros por campo.

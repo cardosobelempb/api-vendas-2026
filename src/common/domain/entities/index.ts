@@ -1,3 +1,3 @@
-export * from './AggregateRoot'
-export * from './DomainEntity'
+export * from './EntityDomain'
+export * from './EntityAggregate'
 export * from './EntityBuild'

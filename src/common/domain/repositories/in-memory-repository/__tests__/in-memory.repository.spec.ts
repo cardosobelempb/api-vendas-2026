@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EntityBuild } from '../../../entities/EntityBuild'
 import { NotFoundError } from '../../../errors'
-import { InMemoryRepository } from '../InMemoryRepository'
+import { RepositoryInMemory } from '../RepositoryInMemory'
 
 type StubEntityProsp = {
   id: UUIDVO
@@ -42,7 +42,7 @@ export class StubFactory implements EntityBuild<StubEntity, StubEntityProsp> {
   }
 }
 
-class StubInMemoryRepository extends InMemoryRepository<StubEntity> {
+class StubInMemoryRepository extends RepositoryInMemory<StubEntity> {
   constructor() {
     super()
     this.sortableFields = ['name']

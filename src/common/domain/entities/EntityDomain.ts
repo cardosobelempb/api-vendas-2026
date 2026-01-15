@@ -9,7 +9,7 @@ import { UUIDVO } from '../values-objects'
  *
  * @template Props Tipo das propriedades internas da entidade.
  */
-export abstract class DomainEntity<Props> {
+export abstract class EntityDomain<Props> {
   /** Identidade única da entidade representada como Value Object */
   private readonly _id: UUIDVO
 
@@ -40,9 +40,9 @@ export abstract class DomainEntity<Props> {
    *
    * @returns true se ambas possuem o mesmo ID
    */
-  public equals(entity?: DomainEntity<unknown>): boolean {
+  public equals(entity?: EntityDomain<unknown>): boolean {
     // Caso especial: null, undefined ou outro tipo
-    if (!entity || !(entity instanceof DomainEntity)) {
+    if (!entity || !(entity instanceof EntityDomain)) {
       return false
     }
 

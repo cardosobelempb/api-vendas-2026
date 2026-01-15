@@ -34,4 +34,5 @@ export enum ErrorCode {
   DUPLICATE_ERROR = 'conflict.duplicate-record.error', // Registro já existe no sistema
   INTEGRITY_VIOLATION = 'conflict.integrity-violation.error', // Violação de integridade referencial
   DATA_INTEGRITY_VIOLATION = 'conflict.data-integrity-violation.error', // Dados conflitantes ou inválidos
+  UNSUPPORTED_MEDIA_TYPE = 'unsupported.media.type.error', // Dados  formato do payload não é um formato suportado
 }

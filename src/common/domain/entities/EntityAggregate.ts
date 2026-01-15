@@ -1,8 +1,8 @@
-import { EventRoot, Events } from '../events'
-import { DomainEntity } from './DomainEntity'
+import { EntityDomain } from '.'
+import { EventDomain, EventBuild } from '../events'
 
 /**
- * AggregateRoot
+ * EntityAggregate
  *
  * - Representa a raiz de um Agregado no DDD.
  * - É responsável por controlar eventos de domínio disparados
@@ -10,19 +10,19 @@ import { DomainEntity } from './DomainEntity'
  * - Mantém encapsulação dos eventos e registra automaticamente
  *   o agregado no sistema de despacho de eventos.
  */
-export abstract class AggregateRoot<Props> extends DomainEntity<Props> {
+export abstract class EntityAggregate<Props> extends EntityDomain<Props> {
   /**
    * Lista interna de eventos de domínio pendentes.
    * Mantida privada para evitar mutações externas.
    */
-  private domainEventsQueue: EventRoot[] = []
+  private domainEventsQueue: EventDomain[] = []
 
   /**
    * Retorna uma cópia dos eventos pendentes.
    * Boa prática: não retornar a referência interna
    * para evitar mutações externas inesperadas.
    */
-  get domainEvents(): EventRoot[] {
+  get domainEvents(): EventDomain[] {
     return [...this.domainEventsQueue]
   }
 
@@ -33,11 +33,11 @@ export abstract class AggregateRoot<Props> extends DomainEntity<Props> {
    * - Nome "register" expressa a intenção de "registrar no sistema".
    * - Evita confusões com métodos que apenas adicionariam ao array.
    */
-  protected registerEvent(event: EventRoot): void {
+  protected registerEvent(event: EventDomain): void {
     this.domainEventsQueue.push(event)
 
     // Notifica o mecanismo de Domain Events
-    Events.markAggregateForDispatch(this)
+    EventBuild.markAggregateForDispatch(this)
   }
 
   /**

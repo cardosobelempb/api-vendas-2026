@@ -1,15 +1,13 @@
 import {
   ConflictError,
   ErrorCode,
-  InMemoryRepository,
   NotFoundError,
-  UUIDVO,
+  RepositoryInMemory,
 } from '@/common'
-import { ProductModel } from '@/products/domain/models/product.model'
-import { ProductRepository } from '@/products/domain/repositories/ProductRespository'
+import { ProductId, ProductModel, ProductRepository } from '@/products/domain'
 
 export class ProductInMemoryRepository
-  extends InMemoryRepository<ProductModel>
+  extends RepositoryInMemory<ProductModel>
   implements ProductRepository
 {
   protected sortableFields: (keyof ProductModel)[] = ['name', 'createdAt']
@@ -17,33 +15,21 @@ export class ProductInMemoryRepository
   async findByName(name: string): Promise<ProductModel> {
     const product = this.items.find(item => item.name === name)
     if (!product) {
-      throw new NotFoundError(`${ErrorCode.NOT_FOUND} name ${name}`)
+      throw new NotFoundError(`${ErrorCode.NOT_FOUND} ${name}`)
     }
     return product
   }
-  /**
-   * Busca produtos em memória a partir de uma lista de IDs.
-   *
-   * @param productIds Lista de UUIDs válidos
-   * @returns Lista de produtos encontrados (pode ser vazia)
-   */
-  async findAllByIds(productIds: UUIDVO[]): Promise<ProductModel[]> {
-    // Caso não haja IDs, retorna lista vazia imediatamente (fail fast)
-    if (productIds.length === 0) {
-      return []
-    }
+  async findAllByIds(productIds: ProductId[]): Promise<ProductModel[]> {
+    // Converte os IDs para um Set para busca eficiente
+    const ids = new Set(productIds.map(productId => productId.id))
 
-    // Converte os IDs para Set para busca O(1)
-    const ids = new Set(productIds)
-
-    // Filtra apenas os produtos cujo ID exista no conjunto
+    // Filtra apenas os produtos existentes
     return this.items.filter(item => ids.has(item.id))
   }
-
-  async ensureNameIsUnique(name: string): Promise<void> {
+  async conflictngName(name: string): Promise<void> {
     const product = this.items.find(item => item.name === name)
     if (product) {
-      throw new ConflictError(ErrorCode.CONFLICT_ERROR)
+      throw new ConflictError(`${ErrorCode.CONFLICT_ERROR} ${name}`)
     }
   }
   protected async applyFilter(

@@ -1,18 +1,18 @@
-import { AggregateRoot } from '../entities'
+import { EntityAggregate } from '../entities'
 import { UUIDVO } from '../values-objects'
-import { EventRoot } from './EventRoot'
+import { EventDomain } from './EventDomain'
 
 /**
  * Callback tipado para eventos de domínio
  */
-export type DomainEventCallback<E extends EventRoot = EventRoot> = (
+export type DomainEventCallback<E extends EventDomain = EventDomain> = (
   event: E,
 ) => void
 
 /**
  * Mapa de handlers por nome do evento
  */
-type HandlersMap = Record<string, Array<DomainEventCallback<EventRoot>>>
+type HandlersMap = Record<string, Array<DomainEventCallback<EventDomain>>>
 
 /**
  * Events
@@ -26,7 +26,7 @@ type HandlersMap = Record<string, Array<DomainEventCallback<EventRoot>>>
  * - Implementação estática por simplicidade
  * - Pode evoluir para serviço injetável futuramente
  */
-export class Events {
+export class EventBuild {
   // ---------------------------------------------------------------------------
   // STATE
   // ---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ export class Events {
   private static handlers: HandlersMap = {}
 
   /** Aggregates com eventos pendentes */
-  private static markedAggregates: AggregateRoot<unknown>[] = []
+  private static markedAggregates: EntityAggregate<unknown>[] = []
 
   /** Flag de controle (útil para testes) */
   public static shouldRun = true
@@ -47,7 +47,7 @@ export class Events {
   /**
    * Registra um handler para um tipo de evento
    */
-  public static register<E extends EventRoot>(
+  public static register<E extends EventDomain>(
     eventName: string,
     callback: DomainEventCallback<E>,
   ): void {
@@ -55,7 +55,7 @@ export class Events {
 
     this.handlers[eventName] = [
       ...handlers,
-      callback as DomainEventCallback<EventRoot>,
+      callback as DomainEventCallback<EventDomain>,
     ]
   }
 
@@ -68,7 +68,7 @@ export class Events {
    * Evita duplicação de aggregates
    */
   public static markAggregateForDispatch(
-    aggregate: AggregateRoot<unknown>,
+    aggregate: EntityAggregate<unknown>,
   ): void {
     const alreadyMarked = this.markedAggregates.some(a =>
       a.id.equals(aggregate.id),
@@ -100,7 +100,7 @@ export class Events {
    * Dispatch direto de um único evento
    * 👉 Ideal para testes de subscribers
    */
-  public static dispatchEvent(event: EventRoot): void {
+  public static dispatchEvent(event: EventDomain): void {
     if (!this.shouldRun) return
 
     this.dispatch(event)
@@ -110,7 +110,7 @@ export class Events {
    * Dispatch de todos os eventos de um aggregate
    */
   private static dispatchAggregateEvents(
-    aggregate: AggregateRoot<unknown>,
+    aggregate: EntityAggregate<unknown>,
   ): void {
     for (const event of aggregate.domainEvents) {
       this.dispatch(event)
@@ -120,7 +120,7 @@ export class Events {
   /**
    * Dispatch de um único evento para seus handlers
    */
-  private static dispatch(event: EventRoot): void {
+  private static dispatch(event: EventDomain): void {
     const eventName = event.constructor.name
     const handlers = this.handlers[eventName]
 
@@ -137,11 +137,11 @@ export class Events {
 
   private static findAggregateById(
     id: UUIDVO,
-  ): AggregateRoot<unknown> | undefined {
+  ): EntityAggregate<unknown> | undefined {
     return this.markedAggregates.find(a => a.id.equals(id))
   }
 
-  private static removeAggregate(aggregate: AggregateRoot<unknown>): void {
+  private static removeAggregate(aggregate: EntityAggregate<unknown>): void {
     this.markedAggregates = this.markedAggregates.filter(
       a => !a.equals(aggregate),
     )

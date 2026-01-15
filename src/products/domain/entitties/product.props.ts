@@ -1,7 +1,8 @@
+// domain/entities/product.props.ts
 import { UUIDVO } from '@/common'
 
-export interface ProductModel {
-  id: UUIDVO // 🔒 obrigatório
+export interface ProductProps {
+  id: UUIDVO
   name: string
   price: number
   quantity: number

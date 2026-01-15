@@ -1,3 +1,3 @@
-export * from './entitties'
+export * from './entities'
 export * from './models'
 export * from './repositories'

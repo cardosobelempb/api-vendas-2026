@@ -13,7 +13,7 @@ import { UUIDVO } from '../values-objects'
  * - Nome padronizado: "occurredAt" em vez de "ocurredAt".
  * - Getter explícito para aggregateId reforça imutabilidade.
  */
-export abstract class EventRoot {
+export abstract class EventDomain {
   /** Timestamp exato em que o evento ocorreu — eventos devem ser imutáveis. */
   public abstract readonly occurredAt: Date
 

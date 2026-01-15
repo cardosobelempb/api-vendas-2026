@@ -1,31 +1,21 @@
-import { SearchableRepository, UUIDVO } from '@/common'
-
+import { RepositoryDomain, UUIDVO } from '@/common'
 import { ProductModel } from '../models/product.model'
 
-/**
- * Contrato de persistência do agregado Produto
- *
- * Regras:
- * - UUIDVO nunca é opcional
- * - Repositório não aceita dados inválidos
- */
-export abstract class ProductRepository extends SearchableRepository<ProductModel> {
-  /**
-   * Busca um produto pelo nome.
-   * Retorna null caso não exista.
-   */
-  abstract findByName(name: string): Promise<ProductModel | null>
+export type ProductId = {
+  id: UUIDVO
+}
+export type ProductCreateProps = {
+  id: UUIDVO
+  name: string
+  price: number
+  quantity: number
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date | null // registros não deletados
+}
 
-  /**
-   * Busca vários produtos a partir de seus IDs.
-   *
-   * @param productIds Lista de UUIDs válidos
-   */
-  abstract findAllByIds(productIds: UUIDVO[]): Promise<ProductModel[]>
-
-  /**
-   * Verifica se já existe um produto com o mesmo nome.
-   * Lança erro em caso de conflito.
-   */
-  abstract ensureNameIsUnique(name: string): Promise<void>
+export abstract class ProductRepository extends RepositoryDomain<ProductModel> {
+  abstract findByName(name: string): Promise<ProductModel>
+  abstract findAllByIds(productIds: ProductId[]): Promise<ProductModel[]>
+  abstract conflictngName(name: string): Promise<void>
 }

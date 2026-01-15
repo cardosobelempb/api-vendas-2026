@@ -1,7 +1,5 @@
-import { UUIDVO } from '@/common'
-import { ProductEntity } from '@/products/domain/entitties/product.entity'
+import { ProductEntity } from '@/products/domain/entitties'
 import { ProductModel } from '@/products/domain/models/product.model'
-
 import { faker } from '@faker-js/faker'
 
 /**
@@ -16,15 +14,11 @@ export function productBuild(
   // Seed para previsibilidade (documentado)
   faker.seed(1)
 
-  return ProductEntity.create(
-    {
-      id: override.id ?? UUIDVO.create(),
-      name: override.name ?? faker.commerce.productName(),
-      price:
-        override.price ??
-        Number(faker.commerce.price({ min: 100, max: 2000, dec: 2 })),
-      quantity: override.quantity ?? 10,
-    },
-    override.id,
-  )
+  return ProductEntity.create({
+    name: override.name ?? faker.commerce.productName(),
+    price:
+      override.price ??
+      Number(faker.commerce.price({ min: 100, max: 2000, dec: 2 })),
+    quantity: override.quantity ?? 10,
+  })
 }

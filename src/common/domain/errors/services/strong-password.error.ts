@@ -1,4 +1,4 @@
-import { IServiceError } from './service-error.interface'
+import { IServiceError } from './IServiceError'
 
 export class StrongPasswordError extends Error implements IServiceError {
   constructor(message: string, password: string) {

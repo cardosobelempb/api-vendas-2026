@@ -48,7 +48,8 @@
     "skipLibCheck": true,
   },
   "include": [
-    "src"
+    "src",
+    "src/common/domain/errors/services/DuplicateError.ts"
   ],
   "exclude": [
     "dist",
